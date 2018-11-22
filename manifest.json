@@ -1,0 +1,26 @@
+{
+	"name": "PressForward Nominate This",
+	"version": "0.1",
+	"description": "Nominate This",
+	"manifest_version": 2,
+	"browser_action": {
+		"default_icon": "icon.png",
+		"default_popup": "popup.html"
+	},
+	"options_page": "options.html",
+	"permissions": [
+		"storage",
+		"declarativeContent",
+		"activeTab",
+		"clipboardRead",
+		"http://*/*",
+		"https://*/*"
+	],
+	"background": {
+		"scripts": [
+			"background.js"
+		],
+		"persistent": false
+	},
+	"content_security_policy": "script-src 'self' https:* 'unsafe-inline'; object-src 'self'"
+}
