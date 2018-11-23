@@ -6,11 +6,18 @@ chrome.tabs.executeScript(null, {
 			{ file: 'pell.js' },
 			function (resultArray) {
 				console.log("init nt wysiwyg");
-				var cssUrl = chrome.runtime.getURL("nomthis.css");
-				console.log('cssurl', cssUrl);
-				chrome.tabs.insertCSS(null, { file: './nomthis.css', runAt: 'document_start' },
+				//var cssUrl = chrome.runtime.getURL("nomthis.css");
+				//console.log('cssurl', cssUrl);
+				var cssJs = ' \
+				var link = document.createElement("link"); \
+				link.href ="'+ 'a' + '"; \
+				link.type = "text/css"; \
+				link.rel = "stylesheet"; \
+				link.media = "screen,print"; \
+				document.getElementsByTagName("head")[0].appendChild(link);';
+				chrome.tabs.executeScript(null, { file: 'nomthis.css.js' },
 					function () {
-						chrome.tabs.executeScript(null, { code: "console.log('PF CSS URL Insert " + cssUrl + "')" });
+						chrome.tabs.executeScript(null, { code: "console.log('PF CSS URL Insert')" });
 					}
 				);
 

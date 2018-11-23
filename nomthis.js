@@ -2646,7 +2646,7 @@ window.pfMetaData.init();
 				classes: {
 					actionbar: 'pell-actionbar',
 					button: 'pell-button',
-					content: 'nominateText',
+					content: 'nominateText pell-content',
 					selected: 'pell-button-selected'
 				},
 				onChange: html => {
