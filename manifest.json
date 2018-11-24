@@ -4,23 +4,30 @@
 	"description": "Nominate This",
 	"manifest_version": 2,
 	"browser_action": {
-		"default_icon": "icon.png",
-		"default_popup": "popup.html"
+		"default_icon": "icon.png"
 	},
 	"options_page": "options.html",
+	"web_accessible_resources": [
+		"nomthis.js",
+		"pell.js",
+		"submit.js",
+		"sound.mp3"
+	],
 	"permissions": [
 		"storage",
 		"declarativeContent",
 		"activeTab",
 		"clipboardRead",
+		"background",
 		"http://*/*",
 		"https://*/*"
 	],
 	"background": {
 		"scripts": [
-			"background.js"
-		],
-		"persistent": false
+			"background.js",
+			"handler.js",
+			"nomthis-init.js"
+		]
 	},
 	"content_security_policy": "script-src 'self' https:* 'unsafe-inline'; object-src 'self'"
 }

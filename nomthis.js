@@ -2704,7 +2704,7 @@ window.pfnt_deactivate = function () {
 	window.pfnt.windows.mainWindow.remove();
 }
 
-window.pfntSubmit = function (publish) {
+window.pfntSubmitOld = function (publish) {
 	console.log('Submitting to PressForward');
 	window.pfnt.submitObject.post_title = window.document.getElementById('pressforward-nt__inputfield__title').value;
 	window.pfnt.submitObject.item_author = window.document.getElementById('pressforward-nt__inputfield__byline').value;
@@ -2745,3 +2745,24 @@ window.pfntSubmit = function (publish) {
 	var data = urlEncodedData;
 	xhr.send(data);
 };
+
+function attachSubmit() {
+	window.pfntSubmit = function (publish) {
+		console.log('Submitting to PressForward');
+		window.pfnt.submitObject.post_title = window.document.getElementById('pressforward-nt__inputfield__title').value;
+		window.pfnt.submitObject.item_author = window.document.getElementById('pressforward-nt__inputfield__byline').value;
+		window.pfnt.submitObject.content = window.document.getElementById('nominateText').innerHTML;
+		window.pfnt.submitObject.item_feat_img = window.pfMetaData.image;
+		window.pfnt.submitObject.post_tags = window.document.querySelector('#pressforward-nt__preview-tags-container input').value;
+		if (publish) {
+			window.pfnt.submitObject.publish = 'Last Step';
+			window.pfnt.submitObject.post_status = 'publish';
+		}
+		window.pfnt.submitObject.extensionMode = true;
+		chrome.runtime.sendMessage(window.pfnt.extensionID, window.pfnt.submitObject, null, function () { });
+	};
+}
+// attachSubmit();
+// console.log('Window.pfntSubmit = ', window.pfntSubmit);
+
+window.initEditor();
