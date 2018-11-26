@@ -93,5 +93,7 @@ chrome.browserAction.onClicked.addListener(function () {
 		var data = urlEncodedData;
 		xhr.send(data);
 	}
+
+	chrome.tabs.executeScript({file: "/content_scripts/bind_submit.js"})
 });
 //,"default_popup": "popup.html"
