@@ -1,3 +1,4 @@
+window.pfnt = {};
 
 function handleSubmit(submitObject, submitEndpoint) {
 	window.pfnt.submitObject = submitObject;

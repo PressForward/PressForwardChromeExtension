@@ -2169,21 +2169,23 @@ if (typeof module === "object") {
 }
 window.pfMetaData = {
 	self: this,
-	title: '',
-	description: '',
-	image: '',
-	author: '',
-	feed: '',
-	canonical: '',
-	keywords: [],
-	openGraph: {
+	data: {
 		title: '',
-		type: 'article'
+		description: '',
+		image: '',
+		author: '',
+		feed: '',
+		canonical: '',
+		keywords: [],
+		openGraph: {
+			title: '',
+			type: 'article'
+		},
+		twitter: {
+			title: '',
+		},
+		jsonLD: {},
 	},
-	twitter: {
-		title: '',
-	},
-	jsonLD: {},
 	checkForProp: function (val) {
 		if (val === undefined || val === null || val === false || val.length < 1) {
 			return false;
@@ -2193,64 +2195,70 @@ window.pfMetaData = {
 	},
 	init: function () {
 		var self = window.pfMetaData;
-		self.title = document.title;
+		self.data.title = document.title;
 		self.processMeta();
 		self.processLinks();
 		self.processJSONLD();
 		self.assureMajorMetadataFilled();
+		var aTag = document.createElement('input');
+		aTag.setAttribute('id', 'pfnt-pfMetaData');
+		aTag.setAttribute('style', 'display:none;');
+		console.log();
+		aTag.value = JSON.stringify(self.data);
+		document.getElementsByTagName('body')[0].appendChild(aTag);
 	},
 	assureMajorMetadataFilled: function () {
 		var self = window.pfMetaData;
 		if (false === self.cascadeMetaValues('title')) {
-			if (self.checkForProp(self.jsonLD.headline)) {
-				self.title = self.jsonLD.headline;
+			if (self.checkForProp(self.data.jsonLD.headline)) {
+				self.data.title = self.jsonLD.headline;
 			}
 		}
 		if (false === self.cascadeMetaValues('description')) {
-			if (self.checkForProp(self.jsonLD.description)) {
-				self.description = self.jsonLD.description;
+			if (self.checkForProp(self.data.jsonLD.description)) {
+				self.data.description = self.jsonLD.description;
 			}
 		}
 		if (false === self.cascadeMetaValues('author')) {
-			if (self.checkForProp(self.jsonLD.author) && self.checkForProp(self.jsonLD.author.name)) {
-				self.author = self.jsonLD.author.name;
+			if (self.checkForProp(self.data.jsonLD.author) && self.checkForProp(self.data.jsonLD.author.name)) {
+				self.data.author = self.data.jsonLD.author.name;
 			}
 		}
 		if (false === self.cascadeMetaValues('image')) {
-			if (self.checkForProp(self.jsonLD.image) && self.checkForProp(self.jsonLD.image[0])) {
-				self.image = self.jsonLD.image[0];
+			if (self.checkForProp(self.data.jsonLD.image) && self.checkForProp(self.data.jsonLD.image[0])) {
+				self.data.image = self.jsonLD.image[0];
 			}
 		}
 		if (false === self.checkForProp('canonical')) {
-			if (self.checkForProp(self.openGraph.url)) {
-				self.canonical = self.openGraph.url;
-			} else if (self.checkForProp(self.jsonLD.mainEntityOfPage) && self.checkForProp(self.jsonLD.mainEntityOfPage['@id'])) {
-				self.canonical = self.jsonLD.mainEntityOfPage['@id'];
+			if (self.checkForProp(self.data.openGraph.url)) {
+				self.data.canonical = self.data.openGraph.url;
+			} else if (self.checkForProp(self.data.jsonLD.mainEntityOfPage) && self.checkForProp(self.data.jsonLD.mainEntityOfPage['@id'])) {
+				self.data.canonical = self.data.jsonLD.mainEntityOfPage['@id'];
 			}
 		}
-		if (false !== self.checkForProp(self.openGraph.section)) {
-			self.keywords.push(self.openGraph.section);
+		if (false !== self.checkForProp(self.data.openGraph.section)) {
+			self.data.keywords.push(self.data.openGraph.section);
 		}
-		if (false !== self.checkForProp(self.openGraph.tag)) {
-			self.keywords = self.keywords.concat(self.openGraph.tag);
+		if (false !== self.checkForProp(self.data.openGraph.tag)) {
+			self.data.keywords = self.data.keywords.concat(self.data.openGraph.tag);
 		}
 		var metaKeywords = document.querySelector('meta[name="keywords"]');
 		if (null !== metaKeywords && undefined !== metaKeywords) {
 			var keywordsString = metaKeywords.content;
-			self.keywords = self.keywords.concat(keywordsString.split(','));
+			self.data.keywords = self.data.keywords.concat(keywordsString.split(','));
 		}
 	},
 	cascadeMetaValues: function (prop) {
 		var self = window.pfMetaData;
-		if (!self.checkForProp(self[prop])) {
-			if (!self.checkForProp(self.openGraph[prop])) {
-				if (!self.checkForProp(self.twitter[prop])) {
+		if (!self.checkForProp(self.data[prop])) {
+			if (!self.checkForProp(self.data.openGraph[prop])) {
+				if (!self.checkForProp(self.data.twitter[prop])) {
 					return false;
 				} else {
-					self[prop] = self.twitter[prop];
+					self.data[prop] = self.data.twitter[prop];
 				}
 			} else {
-				self[prop] = self.openGraph[prop];
+				self.data[prop] = self.data.openGraph[prop];
 			}
 		}
 		return true;
@@ -2263,14 +2271,14 @@ window.pfMetaData = {
 		if (ogTags.length > 0) {
 			console.log(ogTags);
 			if (element === 'og:type' && ogTags[0] && ogTags[0].length && ogTags[0].hasOwnPropery('content')) {
-				self.openGraph[element.substring(firstTriple)] = ogTags[0].content;
+				self.data.openGraph[element.substring(firstTriple)] = ogTags[0].content;
 			} else if (1 === ogTags.length) {
-				self.openGraph[element.substring(firstTriple)] = ogTags[0].content;
+				self.data.openGraph[element.substring(firstTriple)] = ogTags[0].content;
 			} else if (ogTags.length > 1) {
 				var elementName = element.substring(firstTriple);
-				self.openGraph[elementName] = [];
+				self.data.openGraph[elementName] = [];
 				ogTags.forEach(function (element) {
-					self.openGraph[elementName].push(element.content);
+					self.data.openGraph[elementName].push(element.content);
 				});
 			}
 		}
@@ -2285,7 +2293,7 @@ window.pfMetaData = {
 		defaultMetas.forEach(function (element) {
 			var self = window.pfMetaData;
 			if (undefined !== metas[element]) {
-				self[element] = metas[element].content;
+				self.data[element] = metas[element].content;
 			}
 		});
 		var twitterMetas = [
@@ -2299,7 +2307,7 @@ window.pfMetaData = {
 		twitterMetas.forEach(function (element) {
 			var self = window.pfMetaData;
 			if (undefined !== metas[element]) {
-				window.pfMetaData.twitter[element.substring(8)] = metas[element].content;
+				window.pfMetaData.data.twitter[element.substring(8)] = metas[element].content;
 			}
 		});
 		var ogPropertyMetas = [
@@ -2316,16 +2324,16 @@ window.pfMetaData = {
 			self.processOpenGraphTag(element, 'og');
 		});
 		var ogPropertyTypeMetas = [
-			self.openGraph.type + ':published_time',
-			self.openGraph.type + ':author',
-			self.openGraph.type + ':publisher',
-			self.openGraph.type + ':section',
-			self.openGraph.type + ':tag',
-			self.openGraph.type + ':image',
+			self.data.openGraph.type + ':published_time',
+			self.data.openGraph.type + ':author',
+			self.data.openGraph.type + ':publisher',
+			self.data.openGraph.type + ':section',
+			self.data.openGraph.type + ':tag',
+			self.data.openGraph.type + ':image',
 		];
 		ogPropertyTypeMetas.forEach(function (element) {
 			var self = window.pfMetaData;
-			self.processOpenGraphTag(element, self.openGraph.type);
+			self.processOpenGraphTag(element, self.data.openGraph.type);
 		});
 	},
 	processLink: function (selector) {
@@ -2339,14 +2347,14 @@ window.pfMetaData = {
 	processLinks: function () {
 		var self = window.pfMetaData;
 		// var links = document.getElementsByTagName('link');
-		self.canonical = self.processLink('rel="canonical"');
-		self.feed = self.processLink('type="application/rss+xml"');
+		self.data.canonical = self.processLink('rel="canonical"');
+		self.data.feed = self.processLink('type="application/rss+xml"');
 	},
 	processJSONLD: function () {
 		var self = window.pfMetaData;
 		var JSONLDTag = document.head.querySelector('script[type="application/ld+json"]');
 		if (null !== JSONLDTag) {
-			self.jsonLD = JSON.parse(JSONLDTag.innerHTML);
+			self.data.jsonLD = JSON.parse(JSONLDTag.innerHTML);
 		}
 	}
 };
@@ -2491,7 +2499,7 @@ window.pfMetaData.init();
 	}
 
 	function sidebar(container) {
-		var imageStyles = 'background-image: url(' + window.pfMetaData.image + ');' +
+		var imageStyles = 'background-image: url(' + window.pfMetaData.data.image + ');' +
 			'width: 100%;' +
 			'background-size: contain;' +
 			'background-repeat: no-repeat;' +
@@ -2501,14 +2509,14 @@ window.pfMetaData.init();
 			'display: block;' +
 			'box-sizing: border-box;';
 		var imageArea = generateTag('div', 'pressforward-nt__preview-image', 'preview-image', imageStyles);
-		imageArea.src = window.pfMetaData.image;
+		imageArea.src = window.pfMetaData.data.image;
 
 		var tagStyles = 'width: 80%;' +
 			'height: 26px;' +
 			'font-size: small;' +
 			'margin-left: 10px;';
 		var tagContainer = generateTag('div', 'pressforward-nt__preview-tags-container', 'meta-box pressforward-nt-box', 'height:18%; overflow:hidden; display: block;');
-		tagContainer.innerHTML = '<h5>Tags</h5><input type="text" value="' + window.pfMetaData.keywords.join(', ') + '" style="' + tagStyles + '">';
+		tagContainer.innerHTML = '<h5>Tags</h5><input type="text" value="' + window.pfMetaData.data.keywords.join(', ') + '" style="' + tagStyles + '">';
 		// tagContainer.appendChild(imageArea);
 
 		var imageContainer = generateTag('div', 'pressforward-nt__preview-image-container', 'meta-box pressforward-nt-box', 'height:36%; overflow:hidden; display: block;');
@@ -2520,6 +2528,8 @@ window.pfMetaData.init();
 		buttonContainer.innerHTML += '<button id="nominate-button" role="presentation" type="button" tabindex="-1" style="width: 100px; height: 30px; margin: 22px 10px; float: right; font-size: 14px;" onclick="window.pfntSubmit(false)">Nominate</button>';
 		// buttonContainer.appendChild(imageArea);
 
+		var hiddenContainer = generateTag('input', 'pressforward-nt__input-data', '', 'overflow:hidden; display: none;');
+		container.appendChild(hiddenContainer);
 		container.appendChild(tagContainer);
 		container.appendChild(imageContainer);
 		container.appendChild(buttonContainer);
@@ -2541,15 +2551,15 @@ window.pfMetaData.init();
 		windows.titleField = generateTag('input', 'pressforward-nt__inputfield__title', 'pressforward-nt__inputfield', '');
 		windows.titleField.setAttribute('type', 'text');
 		if (window.pfReadability.article.title <= 1) {
-			windows.titleField.setAttribute('value', window.pfMetaData.title);
+			windows.titleField.setAttribute('value', window.pfMetaData.data.title);
 		} else {
 			windows.titleField.setAttribute('value', window.pfReadability.article.title);
 		}
 
 		windows.bylineField = generateTag('input', 'pressforward-nt__inputfield__byline', 'pressforward-nt__inputfield', '');
 		windows.bylineField.setAttribute('type', 'text');
-		if (window.pfMetaData && window.pfMetaData.hasOwnProperty('author')) {
-			windows.bylineField.setAttribute('value', window.pfMetaData.author);
+		if (window.pfMetaData && window.pfMetaData.data && window.pfMetaData.data.hasOwnProperty('author')) {
+			windows.bylineField.setAttribute('value', window.pfMetaData.data.author);
 		} else if (window.pfReadability && window.pfReadability.hasOwnProperty('article') && window.pfReadability.article.hasOwnProperty('byline') && window.pfReadability.article.byline.length <= 1) {
 			windows.bylineField.setAttribute('value', window.pfReadability.article.byline);
 		}
@@ -2746,22 +2756,24 @@ window.pfntSubmitOld = function (publish) {
 	xhr.send(data);
 };
 
-function attachSubmit() {
-	window.pfntSubmit = function (publish) {
-		console.log('Submitting to PressForward');
-		window.pfnt.submitObject.post_title = window.document.getElementById('pressforward-nt__inputfield__title').value;
-		window.pfnt.submitObject.item_author = window.document.getElementById('pressforward-nt__inputfield__byline').value;
-		window.pfnt.submitObject.content = window.document.getElementById('nominateText').innerHTML;
-		window.pfnt.submitObject.item_feat_img = window.pfMetaData.image;
-		window.pfnt.submitObject.post_tags = window.document.querySelector('#pressforward-nt__preview-tags-container input').value;
-		if (publish) {
-			window.pfnt.submitObject.publish = 'Last Step';
-			window.pfnt.submitObject.post_status = 'publish';
-		}
-		window.pfnt.submitObject.extensionMode = true;
-		chrome.runtime.sendMessage(window.pfnt.extensionID, window.pfnt.submitObject, null, function () { });
-	};
-}
+//function attachSubmit() {
+window.pfntSubmit = function (publish) {
+	console.log('On Page Submitting to PressForward');
+	window.pfMetaData = JSON.parse(window.document.getElementById('pfnt-pfMetaData').value);
+	window.pfnt.submitObject.post_title = window.document.getElementById('pressforward-nt__inputfield__title').value;
+	window.pfnt.submitObject.item_author = window.document.getElementById('pressforward-nt__inputfield__byline').value;
+	window.pfnt.submitObject.content = window.document.getElementById('nominateText').innerHTML;
+	window.pfnt.submitObject.item_feat_img = window.pfMetaData.image;
+	window.pfnt.submitObject.post_tags = window.document.querySelector('#pressforward-nt__preview-tags-container input').value;
+	if (publish) {
+		window.pfnt.submitObject.publish = 'Last Step';
+		window.pfnt.submitObject.post_status = 'publish';
+	}
+	window.pfnt.submitObject.extensionMode = true;
+	window.document.getElementById('pressforward-nt__input-data').value = JSON.stringify(window.pfnt.submitObject);
+	//chrome.runtime.sendMessage(window.pfnt.extensionID, window.pfnt.submitObject, null, function () { });
+};
+//}
 // attachSubmit();
 // console.log('Window.pfntSubmit = ', window.pfntSubmit);
 
