@@ -6,12 +6,15 @@
 	"browser_action": {
 		"default_icon": "icon.png"
 	},
-	"options_page": "options.html",
+	"options_ui": {
+		"page": "settings.html",
+		"open_in_tab": false
+	},
 	"web_accessible_resources": [
 		"nomthis.js",
 		"pell.js",
 		"submit.js",
-		"sound.mp3"
+		"nomthis.css.js"
 	],
 	"permissions": [
 		"storage",

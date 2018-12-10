@@ -22,7 +22,7 @@ chrome.browserAction.onClicked.addListener(function () {
 	},
 		function (resultArray) {
 			chrome.tabs.executeScript(null,
-				{ code: attachScriptFirst('pell') },
+				{ code: 'console.log("Init Nom This")' },
 				function (resultArray) {
 					console.log("init nt wysiwyg");
 					//var cssUrl = chrome.runtime.getURL("nomthis.css");
@@ -94,6 +94,6 @@ chrome.browserAction.onClicked.addListener(function () {
 		xhr.send(data);
 	}
 
-	chrome.tabs.executeScript({file: "/content_scripts/bind_submit.js"})
+	chrome.tabs.executeScript({ file: "/content_scripts/bind_submit.js" })
 });
 //,"default_popup": "popup.html"
