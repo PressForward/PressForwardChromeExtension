@@ -11,6 +11,7 @@ function attachNewSubmit() {
 			window.pfnt.submitObject.post_status = 'publish';
 		}
 		window.pfnt.submitObject.extensionMode = true;
+		window.document.getElementById('pressforward-nt__input-data').value = JSON.stringify(window.pfnt.submitObject);
 		console.log('submitObject = ', window.pfnt.submitObject);
 		console.log('extensionID = ', window.localStorage.getItem('extensionID'));
 		var response = chrome.runtime.sendMessage(window.localStorage.getItem('extensionID'), window.pfnt.submitObject, null, function () { console.log('PFNT Message Sent'); });

@@ -25,7 +25,8 @@
 				}
 				submitObject.extensionMode = true;
 				submitObject = JSON.parse(window.document.getElementById('pressforward-nt__input-data').value);
-				submitObject.user_key = '65794a30655841694f694a4b563151694c434a68624763694f694a49557a49314e694a392e65794a725a586c666332566c5a434936496e426d4969776964584e6c636c397a5a57566b496a6f69597a49344d3246694e44526a4e7a4e68596d5532593245784d54416966512e434e36667835645a4744425f3367497145334936316847643547702d634f644c494a6770776a6a30514267';
+				// Perhaps encode this plus date with the private key to make sure that the window the plugin added is what is sending the data?
+				submitObject.user_key = '65794a30655841694f694a4b563151694c434a68624763694f694a49557a49314e694a392e65794a725a586c666332566c5a434936496e426d4969776964584e6c636c397a5a57566b496a6f694e6d46694e7a497a4e44466c4f5455305a57526d5a545a694e5751794d694a392e2d62536d32446c4a507741326a6a526f6b365f66525261566f41575566367a306d3943315751644b395a63';
 				//console.log(submitObject);
 				console.log('submitObject = ', submitObject);
 				console.log('extensionID = ', window.localStorage.getItem('extensionID'));

@@ -4,6 +4,7 @@ function handleSubmit(submitObject, submitEndpoint) {
 	window.pfnt.submitObject = submitObject;
 	var urlEncodedData = "";
 	var urlEncodedDataPairs = [];
+	console.log('Object to submit', submitObject);
 	Object.keys(window.pfnt.submitObject).forEach((key) => {
 		if (window.pfnt.submitObject[key]) {
 			if ('string' === typeof window.pfnt.submitObject[key]) {
@@ -43,8 +44,8 @@ chrome.runtime.onMessage.addListener(function (pfObject, sender, sendResponse) {
 	if (pfObject.extensionMode) {
 		delete pfObject.extensionMode;
 		handleSubmit(pfObject, window.pfSiteData.submit_endpoint);
+		sendResponse({ pfntMessageListener: "complete" });
 	}
-	sendResponse({ pfntMessageListener: "complete" });
 });
 
 chrome.runtime.onMessageExternal.addListener(function (pfObject, sender, sendResponse) {
