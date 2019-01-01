@@ -2657,6 +2657,8 @@ window.pfMetaData.init();
 		// buttonContainer.appendChild(imageArea);
 
 		var hiddenContainer = generateTag('input', 'pressforward-nt__input-data', '', 'overflow:hidden; display: none;');
+		var hiddenVerifyDataContainer = generateTag('input', 'pressforward-nt__input-verify', '', 'overflow:hidden; display: none;');
+		hiddenVerifyDataContainer.value = window.localStorage.getItem('verifyEncoded');
 
 		var categoryContainer = generateTag('div', 'pressforward-nt__preview-category-container', 'meta-box pressforward-nt-box', 'height:34%; overflow:hidden; display: block;');
 		categoryContainer.innerHTML = '<h5>Categories</h5>';
@@ -2666,6 +2668,7 @@ window.pfMetaData.init();
 
 		container.appendChild(categoryContainer);
 		container.appendChild(hiddenContainer);
+		container.appendChild(hiddenVerifyDataContainer);
 		container.appendChild(tagContainer);
 		container.appendChild(imageContainer);
 		container.appendChild(buttonContainer);

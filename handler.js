@@ -1,5 +1,14 @@
 window.pfnt = {};
 
+function retrieveSettings(key) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.get([key], function (result) {
+			console.log(key + ' Value currently is ' + result);
+			resolve(result[key]);
+		});
+	});
+}
+
 function handleSubmit(submitObject, submitEndpoint) {
 	window.pfnt.submitObject = submitObject;
 	var urlEncodedData = "";
