@@ -37,7 +37,9 @@
 		{
 			"matches": [
 				"http://*/*?page=pf-tools",
-				"https://*/*?page=pf-tools"
+				"https://*/*?page=pf-tools",
+				"http://*/*?page=pf-options",
+				"https://*/*?page=pf-options"
 			],
 			"js": [
 				"populate_settings.js"
