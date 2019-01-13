@@ -2652,8 +2652,8 @@ window.pfMetaData.init();
 		imageContainer.appendChild(imageArea);
 
 		var buttonContainer = generateTag('div', 'pressforward-nt__button-container', 'meta-box pressforward-nt-box', 'height:12%; overflow:hidden; display: block;');
-		buttonContainer.innerHTML = '<button id="submit-button" role="presentation" type="button" tabindex="-1" style="width: 100px; height: 30px; margin: 22px 10px; float: right; font-size: 14px;" onclick="window.pfntSubmit(true)">Submit</button>';
-		buttonContainer.innerHTML += '<button id="nominate-button" role="presentation" type="button" tabindex="-1" style="width: 100px; height: 30px; margin: 22px 10px; float: right; font-size: 14px;" onclick="window.pfntSubmit(false)">Nominate</button>';
+		buttonContainer.innerHTML = '<button id="pressforward-nt__submit-button" role="presentation" type="button" tabindex="-1" style="width: 100px; height: 30px; margin: 22px 10px; float: right; font-size: 14px;" onclick="window.pfntSubmit(true)">Submit</button>';
+		buttonContainer.innerHTML += '<button id="pressforward-nt__nominate-button" role="presentation" type="button" tabindex="-1" style="width: 100px; height: 30px; margin: 22px 10px; float: right; font-size: 14px;" onclick="window.pfntSubmit(false)">Nominate</button>';
 		// buttonContainer.appendChild(imageArea);
 
 		var hiddenContainer = generateTag('input', 'pressforward-nt__input-data', '', 'overflow:hidden; display: none;');

@@ -401,6 +401,75 @@ window.verify = function (algorithm, value, key, isSecretBase64Encoded) {
 };
 
 (function () {
+	var submissionProcess = function (publishCheck) {
+		console.log("clicked. submitting from bind_submit.js");
+		console.log('Submitting to PressForward');
+
+		var verify = window.document.getElementById('pressforward-nt__input-verify').value;
+		chrome.storage.local.get(['ki'], function (result) {
+			// console.log('retrieving private key', result);
+			var privateKey = result.ki;
+			console.log('Verification for encoded ', verify);
+			var test = window.verify('HS256', verify, result.ki, false);
+			if (true !== test.result) {
+				console.log('pfnt: Verification failed');
+				return false;
+			} else {
+				console.log('pfnt: Verification passed');
+			}
+			var parts = verify.split('.');
+			console.log('pfnt: msg parts ', parts);
+			var dateMsg = window.decode(parts[1]);
+			console.log(dateMsg);
+			var datetimeCheck = window.decode(parts[1]); // JSON.parse();
+			console.log('final', datetimeCheck);
+			var createdDate = new Date(datetimeCheck.date);
+			var currentDate = new Date();
+			var maxDate = currentDate.valueOf() - (60000 * 15);
+			var datetimeDiff = maxDate - createdDate;
+			var maxDiff = (60000 * 15);
+			if (datetimeDiff > maxDiff) {
+				console.log('pfnt: Datetime Invalid, longer than 15 min');
+				return false;
+			} else {
+				console.log('pfnt: Datetime conditional passed - diff is ', datetimeDiff);
+			}
+			let publish = true;
+			let submitObject = {};
+			submitObject.post_title = window.document.getElementById('pressforward-nt__inputfield__title').value;
+			submitObject.item_author = window.document.getElementById('pressforward-nt__inputfield__byline').value;
+			submitObject.content = window.document.getElementById('nominateText').innerHTML;
+			//submitObject.item_feat_img = window.pfMetaData.image;
+			submitObject.post_tags = window.document.querySelector('#pressforward-nt__preview-tags-container input').value;
+
+			submitObject.extensionMode = true;
+			console.log('Collect submit object');
+			submitObject = JSON.parse(window.document.getElementById('pressforward-nt__input-data').value);
+			console.log('Submit Object', submitObject);
+			if (publishCheck) {
+				submitObject.publish = 'Last Step';
+				submitObject.post_status = 'publish';
+			}
+			// Perhaps encode this plus date with the private key to make sure that the window the plugin added is what is sending the data?
+			console.log('Retrieve public key');
+			chrome.storage.local.get(['ku'], function (nextResult) {
+				// console.log('pfnt: public key ready', nextResult);
+				var publicKey = nextResult.ku;
+				submitObject.user_key = publicKey;
+				var encodedDateObject = window.sign('HS256', '{ "typ": "JWT", "alg": "HS256" }', '{ "date": "' + (~~(new Date().valueOf() / 1000)) + '" }', privateKey, false);
+				submitObject.verify = encodedDateObject.result;
+				//console.log(submitObject);
+				console.log('submitObject = ', submitObject);
+				console.log('extensionID = ', window.localStorage.getItem('extensionID'));
+				console.log('sending message');
+				let response = chrome.runtime.sendMessage(window.localStorage.getItem('extensionID'), submitObject, function (res) {
+					console.log('PFNT Message Sent');
+					console.log(res);
+				});
+				console.log('response from sendMessage', response);
+			});
+		});
+	}
 	/**
 	 * Check and set a global guard variable.
 	 * If this content script is injected into the same page again,
@@ -409,77 +478,13 @@ window.verify = function (algorithm, value, key, isSecretBase64Encoded) {
 	console.log('bind_submit.js');
 	window.setTimeout(function () {
 		console.log('timeout completed, binding');
-		document.querySelector("#pressforward-nt__button-container button#submit-button").addEventListener("click", (e) => {
+		document.querySelector("#pressforward-nt__button-container button#pressforward-nt__submit-button").addEventListener("click", (e) => {
 			//document.addEventListener("click", (e) => {
-			window.setTimeout(function () {
-				console.log("clicked. submitting from bind_submit.js");
-				console.log('Submitting to PressForward');
-
-				var verify = window.document.getElementById('pressforward-nt__input-verify').value;
-				chrome.storage.local.get(['ki'], function (result) {
-					console.log('retrieving private key', result);
-					var privateKey = result.ki;
-					console.log('Verification for encoded ', verify);
-					var test = window.verify('HS256', verify, result.ki, false);
-					if (true !== test.result) {
-						console.log('pfnt: Verification failed');
-						return false;
-					} else {
-						console.log('pfnt: Verification passed');
-					}
-					var parts = verify.split('.');
-					console.log('pfnt: msg parts ', parts);
-					var dateMsg = window.decode(parts[1]);
-					console.log(dateMsg);
-					var datetimeCheck = window.decode(parts[1]); // JSON.parse();
-					console.log('final', datetimeCheck);
-					var createdDate = new Date(datetimeCheck.date);
-					var currentDate = new Date();
-					var maxDate = currentDate.valueOf() - (60000 * 15);
-					var datetimeDiff = maxDate - createdDate;
-					var maxDiff = (60000 * 15);
-					if (datetimeDiff > maxDiff) {
-						console.log('pfnt: Datetime Invalid, longer than 15 min');
-						return false;
-					} else {
-						console.log('pfnt: Datetime conditional passed - diff is ', datetimeDiff);
-					}
-					let publish = true;
-					let submitObject = {};
-					submitObject.post_title = window.document.getElementById('pressforward-nt__inputfield__title').value;
-					submitObject.item_author = window.document.getElementById('pressforward-nt__inputfield__byline').value;
-					submitObject.content = window.document.getElementById('nominateText').innerHTML;
-					//submitObject.item_feat_img = window.pfMetaData.image;
-					submitObject.post_tags = window.document.querySelector('#pressforward-nt__preview-tags-container input').value;
-
-					submitObject.extensionMode = true;
-					console.log('Collect submit object');
-					submitObject = JSON.parse(window.document.getElementById('pressforward-nt__input-data').value);
-					console.log('Submit Object', submitObject);
-					if (publish) {
-						submitObject.publish = 'Last Step';
-						submitObject.post_status = 'publish';
-					}
-					// Perhaps encode this plus date with the private key to make sure that the window the plugin added is what is sending the data?
-					console.log('Retrieve public key');
-					chrome.storage.local.get(['ku'], function (nextResult) {
-						console.log('pfnt: public key ready', nextResult);
-						var publicKey = nextResult.ku;
-						submitObject.user_key = publicKey;
-						var encodedDateObject = window.sign('HS256', '{ "typ": "JWT", "alg": "HS256" }', '{ "date": "' + (~~(new Date().valueOf() / 1000)) + '" }', privateKey, false);
-						submitObject.verify = encodedDateObject.result;
-						//console.log(submitObject);
-						console.log('submitObject = ', submitObject);
-						console.log('extensionID = ', window.localStorage.getItem('extensionID'));
-						console.log('sending message');
-						let response = chrome.runtime.sendMessage(window.localStorage.getItem('extensionID'), submitObject, function (res) {
-							console.log('PFNT Message Sent');
-							console.log(res);
-						});
-						console.log('response from sendMessage', response);
-					});
-				});
-			}, 5000);
+			window.setTimeout(function () { submissionProcess(true) }, 5000);
+		});
+		document.querySelector("#pressforward-nt__button-container button#pressforward-nt__nominate-button").addEventListener("click", (e) => {
+			//document.addEventListener("click", (e) => {
+			window.setTimeout(function () { submissionProcess(false) }, 5000);
 		});
 	}, 4000);
 })();
