@@ -442,7 +442,6 @@ window.verify = function (algorithm, value, key, isSecretBase64Encoded) {
 			//submitObject.item_feat_img = window.pfMetaData.image;
 			submitObject.post_tags = window.document.querySelector('#pressforward-nt__preview-tags-container input').value;
 
-			submitObject.extensionMode = true;
 			console.log('Collect submit object');
 			submitObject = JSON.parse(window.document.getElementById('pressforward-nt__input-data').value);
 			console.log('Submit Object', submitObject);
@@ -454,15 +453,20 @@ window.verify = function (algorithm, value, key, isSecretBase64Encoded) {
 			console.log('Retrieve public key');
 			chrome.storage.local.get(['ku'], function (nextResult) {
 				// console.log('pfnt: public key ready', nextResult);
+				var finalSubmitObject = {};
 				var publicKey = nextResult.ku;
-				submitObject.user_key = publicKey;
+				finalSubmitObject.user_key = publicKey;
 				var encodedDateObject = window.sign('HS256', '{ "typ": "JWT", "alg": "HS256" }', '{ "date": "' + (~~(new Date().valueOf() / 1000)) + '" }', privateKey, false);
-				submitObject.verify = encodedDateObject.result;
+				finalSubmitObject.verify = encodedDateObject.result;
+				var encodedData = window.sign('HS256', '{ "typ": "JWT", "alg": "HS256" }', JSON.stringify(submitObject), privateKey, false);
+				finalSubmitObject.data = encodedData.result;
+				finalSubmitObject.extensionMode = true;
 				//console.log(submitObject);
 				console.log('submitObject = ', submitObject);
+				console.log('Final submit = ', finalSubmitObject)
 				console.log('extensionID = ', window.localStorage.getItem('extensionID'));
 				console.log('sending message');
-				let response = chrome.runtime.sendMessage(window.localStorage.getItem('extensionID'), submitObject, function (res) {
+				let response = chrome.runtime.sendMessage(window.localStorage.getItem('extensionID'), finalSubmitObject, function (res) {
 					console.log('PFNT Message Sent');
 					console.log(res);
 				});
