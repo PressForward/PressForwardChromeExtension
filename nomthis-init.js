@@ -417,6 +417,30 @@ function attachScriptLast(scriptName) {
 	return stringBlock;
 }
 
+
+function retrieveSettings(key) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.get([key], function (result) {
+			console.log(key + ' Value currently is ', result[key]);
+			resolve(result[key]);
+		});
+	});
+}
+
+function populateWindow() {
+	return new Promise(async function (resolve, reject) {
+		window.pfSiteData = !!window.pfSiteData ? window.pfSiteData : {};
+		window.pfSiteData.site_url = await retrieveSettings('site_url');
+		window.pfSiteData.plugin_url = await retrieveSettings('plugin_url');
+		window.pfSiteData.submit_endpoint = await retrieveSettings('submit_endpoint');
+		window.pfSiteData.categories_endpoint = await retrieveSettings('categories_endpoint');
+		console.log('window populated', window.pfSiteData);
+		resolve(window.pfSiteData);
+	});
+}
+
+window.populatedCheck = populateWindow();
+
 chrome.browserAction.onClicked.addListener(function () {
 
 	chrome.tabs.executeScript(null, {
@@ -424,13 +448,23 @@ chrome.browserAction.onClicked.addListener(function () {
 	},
 		function (resultArray) {
 			chrome.tabs.executeScript(null,
-				{ code: 'console.log("Init Nom This")' },
+				{ code: 'console.log("Init Nom This");' },
 				function (resultArray) {
+					window.populatedCheck.then(function (value) {
+						var codestring = "window.localStorage.setItem('site_url', '" + window.pfSiteData.site_url + "'); " +
+							"window.localStorage.setItem('plugin_url', '" + window.pfSiteData.plugin_url + "'); " +
+							"window.localStorage.setItem('submit_endpoint', '" + window.pfSiteData.submit_endpoint + "'); " +
+							"window.localStorage.setItem('categories_endpoint', '" + window.pfSiteData.categories_endpoint + "'); " +
+							"console.log('set sitedata', window.pfSiteData);";
+						console.log('script prepped', codestring);
+						chrome.tabs.executeScript(null, { code: codestring });
+					});
 					var privateKey = chrome.storage.local.get(['ki'], function (result) {
 						console.log('ki Value currently is ' + result);
 						var signDate = window.sign('HS256', '{ "typ": "JWT", "alg": "HS256" }', '{ "date": "' + new Date() + '" }', result.ki, false);
 
 						chrome.tabs.executeScript(null, { code: "window.localStorage.setItem('verifyEncoded', '" + signDate.result + "');" });
+
 						// document.getElementById('pressforward-nt__input-verify').value = signDate.result;
 					});
 					console.log("init nt wysiwyg");
@@ -468,10 +502,6 @@ chrome.browserAction.onClicked.addListener(function () {
 			)
 		}
 	);
-	window.pfSiteData = {};
-	window.pfSiteData.site_url = "https://local.wordpress.test";
-	window.pfSiteData.plugin_url = "https://local.wordpress.test/wp-content/plugins/pressforward/";
-	window.pfSiteData.submit_endpoint = "https://local.wordpress.test/wp-json/pf/v1/submit-nomination";
 
 	function handleSubmit(submitObject, submitEndpoint) {
 		window.pfnt.submitObject = submitObject;

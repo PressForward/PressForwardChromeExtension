@@ -1,14 +1,5 @@
 window.pfnt = {};
 
-function retrieveSettings(key) {
-	return new Promise((resolve, reject) => {
-		chrome.storage.local.get([key], function (result) {
-			console.log(key + ' Value currently is ' + result);
-			resolve(result[key]);
-		});
-	});
-}
-
 function handleSubmit(submitObject, submitEndpoint) {
 	window.pfnt.submitObject = submitObject;
 	var urlEncodedData = "";
@@ -43,10 +34,24 @@ function handleSubmit(submitObject, submitEndpoint) {
 	xhr.send(data);
 }
 
-window.pfSiteData = {};
-window.pfSiteData.site_url = "https://local.wordpress.test";
-window.pfSiteData.plugin_url = "https://local.wordpress.test/wp-content/plugins/pressforward/";
-window.pfSiteData.submit_endpoint = "https://local.wordpress.test/wp-json/pf/v1/submit-nomination";
+function retrieveSettings(key) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.get([key], function (result) {
+			console.log(key + ' Value currently is ', result);
+			resolve(result[key]);
+		});
+	});
+}
+
+async function populateWindow() {
+	window.pfSiteData = {};
+	window.pfSiteData.site_url = await retrieveSettings('site_url');
+	window.pfSiteData.plugin_url = await retrieveSettings('plugin_url');
+	window.pfSiteData.submit_endpoint = await retrieveSettings('submit_endpoint');
+	window.pfSiteData.categories_endpoint = await retrieveSettings('categories_endpoint');
+}
+
+populateWindow();
 
 chrome.runtime.onMessage.addListener(function (pfObject, sender, sendResponse) {
 	console.log('received message', pfObject);
