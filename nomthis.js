@@ -2357,7 +2357,11 @@ window.pfMetaData = {
 		var self = window.pfMetaData;
 		var JSONLDTag = document.head.querySelector('script[type="application/ld+json"]');
 		if (null !== JSONLDTag) {
-			self.data.jsonLD = JSON.parse(JSONLDTag.innerHTML);
+			try {
+				self.data.jsonLD = JSON.parse(JSONLDTag.innerHTML);
+			} catch (e) {
+				console.log('JSON LD Broken');
+			}
 		}
 	}
 };
