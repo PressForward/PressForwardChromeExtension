@@ -70,3 +70,13 @@ chrome.runtime.onMessageExternal.addListener(function (pfObject, sender, sendRes
 	}
 	sendResponse({ pfntExternalMessageListener: "complete" });
 });
+
+
+chrome.runtime.onMessage.addListener(function (pfObject, sender, sendResponse) {
+	console.log('received message', pfObject);
+	if (pfObject.settings_mode) {
+		delete pfObject.settings_mode;
+		chrome.storage.local.set(pfObject, () => { });
+		sendResponse({ pfntMessageListener: "complete" });
+	}
+});

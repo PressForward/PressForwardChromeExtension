@@ -9,9 +9,15 @@ function setValueToStorage(key, value) {
 var getSettingsInfo = function (button) {
 	let self = {};
 	self.button = button;
-	let response = chrome.runtime.sendMessage(window.localStorage.getItem('extensionID'), '{extension: "active", settings_mode: true}', (res) => {
+	let response = chrome.runtime.sendMessage('{extension: "active", settings_mode: true}', (res) => {
 		var pfntSiteData = JSON.parse(document.getElementById('pfnt__pfSiteData').value);
 		console.log('PFNT Setting Prep', pfntSiteData, document);
+		pfntSiteData.settings_mode = true;
+		let response = chrome.runtime.sendMessage(pfntSiteData, function (res) {
+			console.log('PFNT Message Sent');
+			console.log(res);
+		});
+		console.log('response from sendMessage', response);
 		chrome.storage.local.set(pfntSiteData, () => {
 			console.log("System variables set for PFNT");
 			if (self.button) {
@@ -48,7 +54,8 @@ window.setTimeout(function () {
 			//document.addEventListener("click", (e) => {
 			window.setTimeout(function () {
 				getSettingsInfo('regenerate-button');
-			}, 5000);
+			}, 1000);
 		});
 	}
-}, 5000);
+}, 1000);
+
