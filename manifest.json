@@ -1,6 +1,6 @@
 {
 	"name": "PressForward Nominate This",
-	"version": "0.1",
+	"version": "0.2",
 	"description": "Nominate This",
 	"manifest_version": 2,
 	"browser_action": {
